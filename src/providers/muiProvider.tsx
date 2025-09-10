@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Box, CircularProgress, CssBaseline } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setTheme } from "@/store/slices/muiTheme";
 import { CacheProvider } from "@emotion/react";
@@ -17,12 +17,15 @@ export default function MuiProviders(props: { children: React.ReactNode }) {
 
 function ThemeConfig(props: { children: React.ReactNode }) {
   const { mode } = useAppSelector((state) => state.muiTheme);
-  const localStorageTheme = localStorage.getItem("theme");
+  const localStorageTheme =
+    typeof window !== "undefined" ? localStorage.getItem("theme") : "";
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (localStorageTheme !== "dark" && localStorageTheme !== "light") {
-      localStorage.setItem("theme", mode);
+      typeof window !== "undefined"
+        ? localStorage.setItem("theme", mode)
+        : null;
     } else {
       dispatch(setTheme({ mode: localStorageTheme }));
     }

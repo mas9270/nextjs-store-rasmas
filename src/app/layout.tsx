@@ -3,8 +3,8 @@ import localFont from "next/font/local";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import MuiProviders from "@/providers/muiProvider";
 import ReduxProvider from "@/providers/reduxProvider";
-import "./globals.css";
 import Layout from "@/components/layout/layout";
+import "./globals.css";
 
 const iranSanse = localFont({
   src: [
