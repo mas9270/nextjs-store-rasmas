@@ -20,3 +20,21 @@ export const appRoutes = [
     icon: "contactUs",
   },
 ];
+
+export const adminRoutes = [
+  {
+    path: "/panel-admin",
+    title: "داشبورد",
+    icon: "dashboard",
+  },
+  {
+    path: "/panel-admin/products",
+    title: "محصولات",
+    icon: "products",
+  },
+  {
+    path: "/panel-admin/users",
+    title: "کاربران",
+    icon: "users",
+  },
+];

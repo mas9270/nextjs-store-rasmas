@@ -1,10 +1,5 @@
-import { Box } from "@mui/material";
-import Dashboard from "./dashboard";
+import React from "react";
 
-export default function PanleAdminPage() {
-  return (
-    <Box width={"100%"}>
-      <Dashboard />
-    </Box>
-  );
+export default function PanelAdminPage() {
+  return <div>پنل ادمین</div>;
 }
