@@ -30,7 +30,7 @@ export default function FooterPage() {
       }}
     >
       <Box
-        maxWidth="1440px"
+        maxWidth="1200px"
         mx="auto"
         display="grid"
         gridTemplateColumns={{ xs: "1fr", md: "repeat(4, 1fr)" }}
