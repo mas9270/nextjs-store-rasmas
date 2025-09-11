@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma"; // مسیر به جای @/generated/prisma
+import { PrismaClient } from "@/generated/prisma"; 
 
 declare global {
   var prisma: PrismaClient | undefined;
