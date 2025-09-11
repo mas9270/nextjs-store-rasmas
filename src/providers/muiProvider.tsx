@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+import { CssBaseline, Box, CircularProgress } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setTheme } from "@/store/slices/muiTheme";
 import { CacheProvider } from "@emotion/react";
@@ -35,6 +35,25 @@ function ThemeConfig(props: { children: React.ReactNode }) {
     key: "muirtl",
     stylisPlugins: [prefixer, rtlPlugin],
   });
+
+  if (!localStorageTheme) {
+    return (
+      <>
+        <CssBaseline />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100vw",
+            height: "100vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </>
+    );
+  }
 
   return (
     <CacheProvider value={cacheRtl}>
