@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/sessions"; // نسخه jose
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
