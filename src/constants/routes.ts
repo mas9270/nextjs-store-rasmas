@@ -5,9 +5,9 @@ export const appRoutes = [
     icon: "home",
   },
   {
-    path: "/product",
+    path: "/products",
     title: "محصولات",
-    icon: "product",
+    icon: "products",
   },
   {
     path: "/about-us",

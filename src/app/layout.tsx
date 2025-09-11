@@ -5,6 +5,9 @@ import MuiProviders from "@/providers/muiProvider";
 import ReduxProvider from "@/providers/reduxProvider";
 import Layout from "@/components/layout/layout";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
+import IntervalTokenChecker from "@/components/shared/intervalTokenChecker";
+
 
 const iranSanse = localFont({
   src: [
@@ -82,7 +85,9 @@ export default function RootLayout({
         <ReduxProvider>
           <AppRouterCacheProvider>
             <MuiProviders>
-              <Layout>{children}</Layout>
+              <ToastContainer />
+              <IntervalTokenChecker />
+              {children}
             </MuiProviders>
           </AppRouterCacheProvider>
         </ReduxProvider>

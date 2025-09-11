@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, Typography, Stack, Divider, useTheme } from "@mui/material";
+import { Box, Typography, Stack, useTheme } from "@mui/material";
 import {
   Mail,
   Phone,
@@ -13,6 +13,7 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
+import { appRoutes } from "@/constants/routes";
 
 export default function FooterPage() {
   const theme = useTheme();
@@ -64,62 +65,24 @@ export default function FooterPage() {
             لینک‌های سریع
           </Typography>
           <Stack spacing={1}>
-            <Link
-              href="/"
-              style={{
-                textDecoration: "none",
-                color: theme.palette.text.primary,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ "&:hover": { textDecoration: "underline" } }}
-              >
-                خانه
-              </Typography>
-            </Link>
-            <Link
-              href="/product"
-              style={{
-                textDecoration: "none",
-                color: theme.palette.text.primary,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ "&:hover": { textDecoration: "underline" } }}
-              >
-                محصولات
-              </Typography>
-            </Link>
-            <Link
-              href="/about-us"
-              style={{
-                textDecoration: "none",
-                color: theme.palette.text.primary,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ "&:hover": { textDecoration: "underline" } }}
-              >
-                درباره ما
-              </Typography>
-            </Link>
-            <Link
-              href="/contact-us"
-              style={{
-                textDecoration: "none",
-                color: theme.palette.text.primary,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ "&:hover": { textDecoration: "underline" } }}
-              >
-                ارتباط با ما
-              </Typography>
-            </Link>
+            {appRoutes.map((item, index) => {
+              return (
+                <Link
+                  href={item.path}
+                  style={{
+                    textDecoration: "none",
+                    color: theme.palette.text.primary,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ "&:hover": { textDecoration: "underline" } }}
+                  >
+                    {item.title}
+                  </Typography>
+                </Link>
+              );
+            })}
           </Stack>
         </Box>
 
