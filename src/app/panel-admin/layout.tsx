@@ -153,7 +153,7 @@ export default function MiniDrawer({
 
   function appBar() {
     return (
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={!matches ? matches : open}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -164,7 +164,7 @@ export default function MiniDrawer({
               {
                 marginRight: 5,
               },
-              open && { display: "none" },
+              (!matches ? !matches : open) && { display: "none" },
             ]}
           >
             <MenuIcon />
@@ -286,7 +286,7 @@ export default function MiniDrawer({
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       {appBar()}
-      <Drawer variant="permanent" open={open}>
+      <Drawer variant="permanent" open={!matches ? matches : open}>
         {drawerHeader()}
         {drawerItems()}
       </Drawer>
