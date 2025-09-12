@@ -28,6 +28,7 @@ import {
   MessagesSquare, // ارتباط با ما
   LayoutDashboard, // داشبورد
 } from "lucide-react";
+import { Tooltip } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -239,26 +240,30 @@ export default function MiniDrawer({
                     },
               ]}
             >
-              <ListItemIcon
-                title={item.title}
-                sx={[
-                  {
-                    minWidth: 0,
-                    justifyContent: "center",
-                    color:
-                      pathName === item.path ? theme.palette.primary.main : "",
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                {setIcon(item.icon)}
-              </ListItemIcon>
+              <Tooltip title={item.title}>
+                <ListItemIcon
+                  title={item.title}
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: "center",
+                      color:
+                        pathName === item.path
+                          ? theme.palette.primary.main
+                          : "",
+                    },
+                    open
+                      ? {
+                          mr: 3,
+                        }
+                      : {
+                          mr: "auto",
+                        },
+                  ]}
+                >
+                  {setIcon(item.icon)}
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText
                 primary={item.title}
                 sx={[

@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
-import { Add, Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete } from "@mui/icons-material";
 import { reactToastify } from "@/lib/toastify";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setLoading } from "@/store/slices/appLoading";
 import AddEditUser from "./_components/addEditUser";
 import DeleteUser from "./_components/deleteUser";
 import { toJalali } from "@/lib/convetDate";
+import { RefreshCcw } from "lucide-react";
 
 export default function UsersPage() {
   const [rows, setRows] = useState<any>([]);
@@ -95,6 +96,8 @@ export default function UsersPage() {
         gap={2}
       >
         <Button
+          sx={{ minWidth: "10px" }}
+          size="small"
           variant="contained"
           onClick={() => {
             setIsAddEditModal({ active: true, info: null });
@@ -103,13 +106,16 @@ export default function UsersPage() {
           افزودن
         </Button>
         <Button
+          title="بازنشانی"
+          sx={{ minWidth: "10px" }}
+          size="small"
           variant="contained"
           color="success"
           onClick={() => {
             getData();
           }}
         >
-          دریافت لیست کاربران
+          <RefreshCcw size={18} />
         </Button>
       </Box>
     );
