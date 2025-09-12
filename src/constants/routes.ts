@@ -25,7 +25,7 @@ export const adminRoutes = [
   {
     path: "/panel-admin",
     title: "داشبورد",
-    icon: "dashboard",
+    icon: "panel-admin",
   },
   {
     path: "/panel-admin/products",
@@ -36,5 +36,15 @@ export const adminRoutes = [
     path: "/panel-admin/users",
     title: "کاربران",
     icon: "users",
+  },
+  {
+    path: "/panel-admin/contact-client",
+    title: "ارتباط با مشتریان",
+    icon: "contact-client",
+  },
+  {
+    path: "/panel-admin/categorys",
+    title: "دسته بندی",
+    icon: "categorys",
   },
 ];

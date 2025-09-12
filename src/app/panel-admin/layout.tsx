@@ -24,6 +24,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import ToggleTheme from "@/components/shared/toggleTheme";
 import { adminRoutes } from "@/constants/routes";
+import {
+  Package, // محصولات
+  Users, // کاربران
+  FolderTree, // دسته بندی
+  MessagesSquare, // ارتباط با ما
+  LayoutDashboard, // داشبورد
+} from "lucide-react";
 
 const drawerWidth = 240;
 
@@ -115,7 +122,7 @@ export default function MiniDrawer({
   children: React.ReactNode;
 }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const matches = useMediaQuery("(min-width:900px)");
   const router = useRouter();
   const pathName = usePathname();
@@ -128,9 +135,27 @@ export default function MiniDrawer({
     setOpen(false);
   };
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
+  function pages() {
+    return (
+      <Box
+        component="main"
+        sx={{
+          width: "100px",
+          p: 3,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "98vh",
+          flex: 1,
+        }}
+      >
+        <DrawerHeader />
+        {children}
+      </Box>
+    );
+  }
+
+  function appBar() {
+    return (
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
@@ -158,7 +183,12 @@ export default function MiniDrawer({
           </Box>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
+    );
+  }
+
+  function drawerHeader() {
+    return (
+      <>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
@@ -169,85 +199,101 @@ export default function MiniDrawer({
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
-          {adminRoutes.map((item, index) => (
-            <ListItem key={index} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                onClick={() => {
-                  router.push(item.path);
-                }}
+      </>
+    );
+  }
+
+  function setIcon(item: string) {
+    switch (item) {
+      case "panel-admin":
+        return <LayoutDashboard />;
+      case "products":
+        return <Package />;
+      case "users":
+        return <Users />;
+      case "contact-client":
+        return <MessagesSquare />;
+      case "categorys":
+        return <FolderTree />;
+    }
+    return null;
+  }
+
+  function drawerItems() {
+    return (
+      <List>
+        {adminRoutes.map((item, index) => (
+          <ListItem key={index} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => {
+                router.push(item.path);
+              }}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <ListItemIcon
+                title={item.title}
                 sx={[
                   {
-                    minHeight: 48,
-                    px: 2.5,
+                    minWidth: 0,
+                    justifyContent: "center",
+                    color:
+                      pathName === item.path ? theme.palette.primary.main : "",
                   },
                   open
                     ? {
-                        justifyContent: "initial",
+                        mr: 3,
                       }
                     : {
-                        justifyContent: "center",
+                        mr: "auto",
                       },
                 ]}
               >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
-                      justifyContent: "center",
-                      color:
-                        pathName === item.path
-                          ? theme.palette.primary.main
-                          : "",
-                    },
-                    open
-                      ? {
-                          mr: 3,
-                        }
-                      : {
-                          mr: "auto",
-                        },
-                  ]}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.title}
-                  sx={[
-                    {
-                      color:
-                        pathName === item.path
-                          ? theme.palette.primary.main
-                          : "",
-                    },
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+                {setIcon(item.icon)}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.title}
+                sx={[
+                  {
+                    color:
+                      pathName === item.path ? theme.palette.primary.main : "",
+                  },
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    );
+  }
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      {appBar()}
+      <Drawer variant="permanent" open={open}>
+        {drawerHeader()}
+        {drawerItems()}
       </Drawer>
-      <Box
-        component="main"
-        sx={{
-          width: "100px",
-          p: 3,
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "98vh",
-          flex: 1,
-        }}
-      >
-        <DrawerHeader />
-        {children}
-      </Box>
+      {pages()}
     </Box>
   );
 }
