@@ -58,7 +58,7 @@ function User() {
 
   const goToOrders = () => {
     setAnchorEl(null);
-    router.push("/profile/orders");
+    router.push("/orders");
   };
 
   function exit() {

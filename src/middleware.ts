@@ -6,7 +6,7 @@ import { decrypt } from "./lib/sessions";
 const publicAuthRoutes = ["/login", "/register", "/reset-password"];
 
 // مسیرهای خصوصی (وقتی کاربر لاگین هست)
-const privateRoutes = ["/profile", "/panel-admin"];
+const privateRoutes = ["/profile", "/panel-admin", "/cart", "/orders"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

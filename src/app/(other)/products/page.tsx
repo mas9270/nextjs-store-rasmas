@@ -106,6 +106,12 @@ export default function ProductsPage() {
     router.push(`?page=${value}`);
   };
 
+  function addToCart(item: unknown) {
+    if (item) {
+      console.log(item);
+    }
+  }
+
   return (
     <Box width={"100%"}>
       {!loading && (
@@ -235,6 +241,7 @@ export default function ProductsPage() {
                       disabled={product.stock === 0}
                       onClick={() => {
                         if (data) {
+                          addToCart(product);
                         } else {
                           reactToastify({
                             type: "warning",
