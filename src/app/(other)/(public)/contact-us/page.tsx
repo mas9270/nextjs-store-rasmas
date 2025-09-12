@@ -23,6 +23,9 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setLoading } from "@/store/slices/appLoading";
+import { reactToastify } from "@/lib/toastify";
 
 // اعتبارسنجی فرم با Zod
 const contactSchema = z.object({
@@ -36,8 +39,10 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactUs() {
   const theme = useTheme();
-
+  const { loading } = useAppSelector((state) => state.appLoading);
+  const dispatch = useAppDispatch();
   const {
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
@@ -45,8 +50,38 @@ export default function ContactUs() {
     resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    alert("پیام شما با موفقیت ارسال شد!");
+  const onSubmit = async (data: ContactFormValues) => {
+    dispatch(setLoading({ loading: true }));
+    fetch("/api/contact-messages", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res) {
+          reactToastify({
+            type: "success",
+            message: "عملیات با موفقیت انجام شد",
+          });
+        } else {
+          reactToastify({
+            type: "warning",
+            message: res.message,
+          });
+        }
+        dispatch(setLoading({ loading: false }));
+        setValue("name", "");
+        setValue("email", "");
+        setValue("subject", "");
+        setValue("message", "");
+      })
+      .catch((err) => {
+        reactToastify({
+          type: "error",
+          message: err?.message ? err.message : "عملیات با موفقیت انجام شد",
+        });
+        dispatch(setLoading({ loading: false }));
+      });
   };
 
   return (
@@ -100,7 +135,13 @@ export default function ContactUs() {
               multiline
               rows={8}
             />
-            <Button type="submit" variant="contained" size="large" fullWidth>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              fullWidth
+              loading={loading}
+            >
               ارسال پیام
             </Button>
           </Stack>

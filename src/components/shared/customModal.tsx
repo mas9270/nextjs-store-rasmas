@@ -62,6 +62,7 @@ export default function CustomModal(props: {
           <Divider />
           <Box p={"10px"} display={"flex"} justifyContent={"end"}>
             <Button
+              size="small"
               loading={loading}
               sx={{ width: "100%" }}
               variant="contained"

@@ -29,22 +29,22 @@ export const adminRoutes = [
   },
   {
     path: "/panel-admin/products",
-    title: "محصولات",
+    title: "مدیریت محصولات",
     icon: "products",
   },
   {
     path: "/panel-admin/users",
-    title: "کاربران",
+    title: "مدیریت کاربران",
     icon: "users",
   },
   {
-    path: "/panel-admin/contact-client",
-    title: "ارتباط با مشتریان",
-    icon: "contact-client",
+    path: "/panel-admin/categories",
+    title: "مدیریت دسته بندی ها",
+    icon: "categories",
   },
   {
-    path: "/panel-admin/categorys",
-    title: "دسته بندی",
-    icon: "categorys",
+    path: "/panel-admin/contact-messages",
+    title: "ارتباط با مشتریان",
+    icon: "contact-messages",
   },
 ];

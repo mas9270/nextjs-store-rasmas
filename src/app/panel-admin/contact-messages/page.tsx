@@ -2,16 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Message, Delete } from "@mui/icons-material";
 import { reactToastify } from "@/lib/toastify";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setLoading } from "@/store/slices/appLoading";
-import AddEditUser from "./_components/addEditUser";
-import DeleteUser from "./_components/deleteUser";
 import { toJalali } from "@/lib/convetDate";
 import { RefreshCcw } from "lucide-react";
+import AddEditContactMessages from "./_components/addEditContactMessages";
+import DeleteContactMessages from "./_components/deleteContactMessages";
+import SendMessageToContact from "./_components/sendMessageToContact";
 
-export default function UsersPage() {
+export default function ContactMessagesPage() {
   const [rows, setRows] = useState<any>([]);
   const { loading } = useAppSelector((state) => state.appLoading);
   const dispatch = useAppDispatch();
@@ -23,19 +24,29 @@ export default function UsersPage() {
     active: false,
     info: null,
   });
+  const [isSendMessage, setIsSendMessage] = useState<{
+    active: boolean;
+    info: any;
+  }>({
+    active: false,
+    info: null,
+  });
   const [isDelete, setIsDelete] = useState<{ active: boolean; info: any }>({
     active: false,
     info: null,
   });
+
   const columns = [
     { field: "id", headerName: "شناسه", width: 100 },
     { field: "name", headerName: "نام", width: 200 },
-    { field: "email", headerName: "ایمیل", width: 300 },
-    { field: "role", headerName: "نقش", width: 300 },
+    { field: "email", headerName: "ایمیل", width: 200 },
+    { field: "subject", headerName: "موضوع", width: 100 },
+    { field: "message", headerName: "پیام", width: 200 },
+    { field: "seen", headerName: "دیده شده", width: 100 },
     {
       field: "createdAt",
       headerName: "زمان ایجاد",
-      width: 300,
+      width: 200,
       renderCell: (params: any) => {
         return <Box>{toJalali(params.row.createdAt)}</Box>;
       },
@@ -54,14 +65,13 @@ export default function UsersPage() {
                 setIsDelete({ active: true, info: params.row });
               }}
             />
-            <Edit
+            <Message
               color="info"
               sx={{ cursor: "pointer" }}
               onClick={() => {
-                setIsAddEditModal({ active: true, info: params.row });
+                setIsSendMessage({ active: true, info: params.row });
               }}
             />
-            {/* </Button> */}
           </Box>
         );
       },
@@ -70,11 +80,11 @@ export default function UsersPage() {
 
   async function getData() {
     dispatch(setLoading({ loading: true }));
-    fetch("/api/users")
+    fetch("/api/contact-messages")
       .then((res) => res.json())
       .then((res) => {
         dispatch(setLoading({ loading: false }));
-        setRows(res.data);
+        setRows(res);
       })
       .catch((err) => {
         reactToastify({
@@ -96,7 +106,7 @@ export default function UsersPage() {
         flexWrap={"wrap"}
         gap={2}
       >
-        <Box>مدیریت کاربران</Box>
+        <Box>مدیریت ارتباط با مشتریان</Box>
         <Box sx={{ display: "flex" }} gap={1}>
           <Button
             title="بازنشانی"
@@ -110,7 +120,7 @@ export default function UsersPage() {
           >
             <RefreshCcw size={18} />
           </Button>
-          <Button
+          {/* <Button
             sx={{ minWidth: "10px" }}
             size="small"
             variant="contained"
@@ -118,8 +128,8 @@ export default function UsersPage() {
               setIsAddEditModal({ active: true, info: null });
             }}
           >
-            افزودن
-          </Button>
+            ایجاد
+          </Button> */}
         </Box>
       </Box>
     );
@@ -221,7 +231,7 @@ export default function UsersPage() {
 
   function addEditModal() {
     return (
-      <AddEditUser
+      <AddEditContactMessages
         data={{
           active: isAddEditModal.active,
           info: isAddEditModal.info,
@@ -239,9 +249,29 @@ export default function UsersPage() {
     );
   }
 
+  function sendMessage() {
+    return (
+      <SendMessageToContact
+        data={{
+          active: isSendMessage.active,
+          info: isSendMessage.info,
+        }}
+        onClose={(done) => {
+          setIsSendMessage({
+            active: false,
+            info: null,
+          });
+          if (done) {
+            getData();
+          }
+        }}
+      />
+    );
+  }
+
   function deleteModal() {
     return (
-      <DeleteUser
+      <DeleteContactMessages
         data={{
           active: isDelete.active,
           info: isDelete.info,
@@ -276,6 +306,7 @@ export default function UsersPage() {
       {actionBtn()}
       {addEditModal()}
       {deleteModal()}
+      {sendMessage()}
       {dataGrid()}
     </Box>
   );

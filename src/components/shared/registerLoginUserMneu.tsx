@@ -16,7 +16,6 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
-
 import { useRouter } from "next/navigation";
 import { checkToken } from "@/store/slices/userInfo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -55,6 +54,11 @@ function User() {
   const goToProfile = () => {
     setAnchorEl(null);
     router.push("/profile");
+  };
+
+  const goToOrders = () => {
+    setAnchorEl(null);
+    router.push("/profile/orders");
   };
 
   function exit() {
@@ -136,6 +140,15 @@ function User() {
               <FolderKanban />
             </ListItemIcon>
             پروفایل
+          </MenuItem>
+        )}
+
+        {data && (data?.role === "ADMIN" || data?.role === "USER") && (
+          <MenuItem onClick={goToOrders}>
+            <ListItemIcon>
+              <FolderKanban />
+            </ListItemIcon>
+            سفارشات
           </MenuItem>
         )}
         <Divider />

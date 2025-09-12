@@ -6,12 +6,12 @@ import { Edit, Delete } from "@mui/icons-material";
 import { reactToastify } from "@/lib/toastify";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setLoading } from "@/store/slices/appLoading";
-import AddEditUser from "./_components/addEditUser";
-import DeleteUser from "./_components/deleteUser";
-import { toJalali } from "@/lib/convetDate";
+import AddEditProducts from "./_components/addEditCategory";
+import DeleteProducts from "./_components/deleteCategory";
+// import { toJalali } from "@/lib/convetDate";
 import { RefreshCcw } from "lucide-react";
 
-export default function UsersPage() {
+export default function CategoryPage() {
   const [rows, setRows] = useState<any>([]);
   const { loading } = useAppSelector((state) => state.appLoading);
   const dispatch = useAppDispatch();
@@ -30,16 +30,6 @@ export default function UsersPage() {
   const columns = [
     { field: "id", headerName: "شناسه", width: 100 },
     { field: "name", headerName: "نام", width: 200 },
-    { field: "email", headerName: "ایمیل", width: 300 },
-    { field: "role", headerName: "نقش", width: 300 },
-    {
-      field: "createdAt",
-      headerName: "زمان ایجاد",
-      width: 300,
-      renderCell: (params: any) => {
-        return <Box>{toJalali(params.row.createdAt)}</Box>;
-      },
-    },
     {
       field: "actionBtn",
       headerName: "عملیات",
@@ -70,11 +60,11 @@ export default function UsersPage() {
 
   async function getData() {
     dispatch(setLoading({ loading: true }));
-    fetch("/api/users")
+    fetch("/api/categories")
       .then((res) => res.json())
       .then((res) => {
         dispatch(setLoading({ loading: false }));
-        setRows(res.data);
+        setRows(res);
       })
       .catch((err) => {
         reactToastify({
@@ -96,7 +86,7 @@ export default function UsersPage() {
         flexWrap={"wrap"}
         gap={2}
       >
-        <Box>مدیریت کاربران</Box>
+        <Box>مدیریت دسته بندی ها</Box>
         <Box sx={{ display: "flex" }} gap={1}>
           <Button
             title="بازنشانی"
@@ -221,7 +211,7 @@ export default function UsersPage() {
 
   function addEditModal() {
     return (
-      <AddEditUser
+      <AddEditProducts
         data={{
           active: isAddEditModal.active,
           info: isAddEditModal.info,
@@ -241,7 +231,7 @@ export default function UsersPage() {
 
   function deleteModal() {
     return (
-      <DeleteUser
+      <DeleteProducts
         data={{
           active: isDelete.active,
           info: isDelete.info,

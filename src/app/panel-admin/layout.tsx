@@ -209,9 +209,9 @@ export default function MiniDrawer({
         return <Package />;
       case "users":
         return <Users />;
-      case "contact-client":
+      case "contact-messages":
         return <MessagesSquare />;
-      case "categorys":
+      case "categories":
         return <FolderTree />;
     }
     return null;
