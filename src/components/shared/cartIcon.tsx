@@ -4,7 +4,7 @@ import { ShoppingCart } from "lucide-react";
 
 export default function CartIcon() {
   return (
-    <Badge badgeContent={4} color="primary">
+    <Badge badgeContent={4} color="primary" sx={{ marginRight: "15px" }}>
       <ShoppingCart />
     </Badge>
   );

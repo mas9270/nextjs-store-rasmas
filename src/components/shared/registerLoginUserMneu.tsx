@@ -67,12 +67,11 @@ function User() {
   }
 
   return (
-    <Box>
+    <>
       <Tooltip title="تنظیمات کاربر">
         <IconButton
           onClick={handleClick}
           size="small"
-          sx={{ ml: 2 }}
           aria-controls={open ? "account-menu" : undefined}
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
@@ -148,7 +147,7 @@ function User() {
           خروج
         </MenuItem>
       </Menu>
-    </Box>
+    </>
   );
 }
 
@@ -156,38 +155,35 @@ function LoginRegister() {
   const router = useRouter();
   const matches = useMediaQuery("(min-width:900px)");
   return (
-    <>
-      <CssBaseline />
-      <Box display={"flex"} gap={1}>
-        <Button
-          title="ورود"
-          sx={{ minWidth: "10px" }}
-          size="small"
-          variant="contained"
-          onClick={() => {
-            router.push("/login");
-          }}
-        >
-          <Box display={"flex"} alignItems={"center"} gap={1}>
-            <LogIn size={18} />
-            {matches && "ورود"}
-          </Box>
-        </Button>
-        <Button
-          title="ثبت نام"
-          sx={{ minWidth: "10px" }}
-          size="small"
-          variant="contained"
-          onClick={() => {
-            router.push("/register");
-          }}
-        >
-          <Box display={"flex"} alignItems={"center"} gap={1}>
-            <UserPlus size={18} />
-            {matches && "ثبت نام"}
-          </Box>
-        </Button>
-      </Box>
-    </>
+    <Box display={"flex"} gap={1}>
+      <Button
+        title="ورود"
+        sx={{ minWidth: "10px" }}
+        size="small"
+        variant="contained"
+        onClick={() => {
+          router.push("/login");
+        }}
+      >
+        <Box display={"flex"} alignItems={"center"} gap={1}>
+          <LogIn size={18} />
+          {matches && "ورود"}
+        </Box>
+      </Button>
+      <Button
+        title="ثبت نام"
+        sx={{ minWidth: "10px" }}
+        size="small"
+        variant="contained"
+        onClick={() => {
+          router.push("/register");
+        }}
+      >
+        <Box display={"flex"} alignItems={"center"} gap={1}>
+          <UserPlus size={18} />
+          {matches && "ثبت نام"}
+        </Box>
+      </Button>
+    </Box>
   );
 }

@@ -37,7 +37,7 @@ export default function Header() {
           />
           <NavLink />
         </Box>
-        <Box component={"div"} display={"flex"} alignItems={"center"} gap={3}>
+        <Box component={"div"} display={"flex"} alignItems={"center"} gap={2}>
           <CartIcon />
           <ToggleTheme />
           <RegisterLoginUserMneu/>
