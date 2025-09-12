@@ -13,7 +13,6 @@ export default function CheckoutPage() {
       justifyContent="center"
       alignItems="center"
       minHeight="70vh"
-      bgcolor="#f5f5f5"
       p={4}
       borderRadius={2}
     >
