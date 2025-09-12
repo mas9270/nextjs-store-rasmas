@@ -38,8 +38,8 @@ export default function Header() {
           <NavLink />
         </Box>
         <Box component={"div"} display={"flex"} alignItems={"center"} gap={3}>
-          <ToggleTheme />
           <CartIcon />
+          <ToggleTheme />
           <RegisterLoginUserMneu/>
         </Box>
       </Box>

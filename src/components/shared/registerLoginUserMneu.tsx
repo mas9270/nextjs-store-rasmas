@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, CssBaseline } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -13,10 +13,14 @@ import {
   CircleUserRound,
   ShieldUser,
   FolderKanban,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { checkToken } from "@/store/slices/userInfo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function RegisterLoginUserMneu() {
   const { data } = useAppSelector((state) => state.userInfo);
@@ -150,17 +154,40 @@ function User() {
 
 function LoginRegister() {
   const router = useRouter();
+  const matches = useMediaQuery("(min-width:900px)");
   return (
-    <Box>
-      <Button
-        size="small"
-        variant="contained"
-        onClick={() => {
-          router.push("/login");
-        }}
-      >
-        ورود / ثبت نام
-      </Button>
-    </Box>
+    <>
+      <CssBaseline />
+      <Box display={"flex"} gap={1}>
+        <Button
+          title="ورود"
+          sx={{ minWidth: "10px" }}
+          size="small"
+          variant="contained"
+          onClick={() => {
+            router.push("/login");
+          }}
+        >
+          <Box display={"flex"} alignItems={"center"} gap={1}>
+            <LogIn size={18} />
+            {matches && "ورود"}
+          </Box>
+        </Button>
+        <Button
+          title="ثبت نام"
+          sx={{ minWidth: "10px" }}
+          size="small"
+          variant="contained"
+          onClick={() => {
+            router.push("/register");
+          }}
+        >
+          <Box display={"flex"} alignItems={"center"} gap={1}>
+            <UserPlus size={18} />
+            {matches && "ثبت نام"}
+          </Box>
+        </Button>
+      </Box>
+    </>
   );
 }
