@@ -124,7 +124,7 @@ function User() {
           <ListItemIcon>
             <CircleUserRound />
           </ListItemIcon>
-          مسعود احمدیان
+          <>{data?.email}</>
         </MenuItem>
         {data && data?.role === "ADMIN" && (
           <MenuItem onClick={goToPanelAdmin}>
