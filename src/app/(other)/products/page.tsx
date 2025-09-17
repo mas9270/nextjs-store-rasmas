@@ -45,6 +45,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(currentPage);
   const { data } = useAppSelector((state) => state.userInfo);
   const { loading } = useAppSelector((state) => state.appLoading);
+  const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
 
   // sync page state with query
@@ -106,9 +107,35 @@ export default function ProductsPage() {
     router.push(`?page=${value}`);
   };
 
-  function addToCart(item: unknown) {
-    if (item) {
-      console.log(item);
+  function addToCart(item: { id: number | null }) {
+    setBtnLoading(true);
+    if (item.id) {
+      fetch("/api/cart", {
+        method: "POST",
+        body: JSON.stringify({ productId: item.id, quantity: 1 }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.success) {
+            reactToastify({
+              type: "success",
+              message: "کالا با موفقیت به سبد خرید افزوده شد",
+            });
+          } else {
+            reactToastify({
+              type: "success",
+              message: res.message,
+            });
+          }
+          setBtnLoading(false);
+        })
+        .catch((err) => {
+          reactToastify({
+            type: "error",
+            message: "خطایی رخ داده است دوباره تلاش کنید",
+          });
+          setBtnLoading(false);
+        });
     }
   }
 
@@ -225,6 +252,7 @@ export default function ProductsPage() {
                     }}
                   >
                     <Button
+                      loading={btnLoading}
                       fullWidth
                       size="small"
                       variant="outlined"
@@ -234,6 +262,7 @@ export default function ProductsPage() {
                       نمایش
                     </Button>
                     <Button
+                      loading={btnLoading}
                       fullWidth
                       size="small"
                       variant="contained"
@@ -241,7 +270,7 @@ export default function ProductsPage() {
                       disabled={product.stock === 0}
                       onClick={() => {
                         if (data) {
-                          addToCart(product);
+                          addToCart({ id: product?.id ? product?.id : null });
                         } else {
                           reactToastify({
                             type: "warning",
