@@ -13,11 +13,12 @@ import {
   ListItemText,
   Divider,
 } from "@mui/material";
-import { RefreshCcw, Delete } from "lucide-react";
+import { RefreshCcw, Paperclip } from "lucide-react";
 import { reactToastify } from "@/lib/toastify";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setLoading } from "@/store/slices/appLoading";
 import { toJalali } from "@/lib/convetDate";
+import { Info } from "@mui/icons-material";
 
 interface OrderItem {
   id: number;
@@ -59,19 +60,13 @@ export default function OrdersPage() {
       headerName: "عملیات",
       width: 150,
       renderCell: (params) => (
-        <Box display="flex" gap={1}>
-          <Button
-            variant="outlined"
+        <Box display={"flex"} alignItems={"center"} height={"100%"} gap={1}>
+          <Info
             color="info"
-            size="small"
-            onClick={() => setSelectedOrder(params.row)}
-          >
-            جزئیات
-          </Button>
-          <Delete
-            color="error"
-            style={{ cursor: "pointer" }}
-            onClick={() => handleDelete(params.row.id)}
+            cursor={"pointer"}
+            onClick={() => {
+              setSelectedOrder(params.row);
+            }}
           />
         </Box>
       ),
@@ -88,17 +83,6 @@ export default function OrdersPage() {
       reactToastify({ type: "error", message: err.message });
     } finally {
       dispatch(setLoading({ loading: false }));
-    }
-  }
-
-  async function handleDelete(orderId: number) {
-    if (!confirm("آیا از حذف سفارش مطمئن هستید؟")) return;
-    try {
-      await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
-      reactToastify({ type: "success", message: "سفارش حذف شد" });
-      getData();
-    } catch (err: any) {
-      reactToastify({ type: "error", message: err.message });
     }
   }
 
