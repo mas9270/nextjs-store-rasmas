@@ -112,7 +112,7 @@ export default function ProductsPage() {
     if (item.id) {
       fetch("/api/cart", {
         method: "POST",
-        body: JSON.stringify({ productId: item.id, quantity: 1 }),
+        body: JSON.stringify({ productId: item.id, quantity: 0 }),
       })
         .then((res) => res.json())
         .then((res) => {
@@ -269,6 +269,7 @@ export default function ProductsPage() {
                       color="secondary"
                       disabled={product.stock === 0}
                       onClick={() => {
+                        console.log(data);
                         if (data) {
                           addToCart({ id: product?.id ? product?.id : null });
                         } else {
