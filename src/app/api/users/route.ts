@@ -1,9 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { getUserIdOrUnauthorized } from "@/lib/sessions";
 
 export async function GET() {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -66,6 +70,9 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const body = await req.json();
     const { id, name, email, password } = body;
 
@@ -122,6 +129,9 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const body = await req.json();
     const { id } = body;
 

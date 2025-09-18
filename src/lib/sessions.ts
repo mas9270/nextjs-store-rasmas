@@ -1,6 +1,7 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -68,4 +69,30 @@ export async function updateSession() {
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
+}
+
+// تابع مشترک برای گرفتن userId از کوکی
+export async function getUserIdFromToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("rasmastoken")?.value;
+  if (!token) return null;
+
+  const payload = await decrypt(token);
+  if (!payload || !payload.id) return null;
+
+  return +payload.id;
+}
+
+export async function getUserIdOrUnauthorized() {
+  const userId = await getUserIdFromToken();
+  if (!userId) {
+    return {
+      error: NextResponse.json(
+        { success: false, message: "توکن نامعتبر یا موجود نیست" },
+        { status: 401 }
+      ),
+      userId: null,
+    };
+  }
+  return { userId, error: null };
 }

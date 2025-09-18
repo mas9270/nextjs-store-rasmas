@@ -44,7 +44,7 @@ export default function ProductDetailPage() {
           type: "success",
           message: "کالا با موفقیت به سبد خرید افزوده شد",
         });
-        return finalData;
+        return finalData.data;
       } else {
         reactToastify({
           type: "success",
@@ -76,7 +76,7 @@ export default function ProductDetailPage() {
       try {
         const res = await fetch(`/api/products/${id}`);
         const data = await res.json();
-        setProduct(data);
+        setProduct(data.data);
       } catch (err) {
         console.error(err);
       } finally {

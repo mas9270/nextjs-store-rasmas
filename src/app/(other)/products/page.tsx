@@ -51,9 +51,7 @@ export default function ProductsPage() {
   const dispatch = useAppDispatch();
 
   const mutation = useMutation({
-
     mutationFn: async (id: number) => {
-      
       const res = await fetch("/api/cart", {
         method: "POST",
         body: JSON.stringify({ productId: id, quantity: 0 }),
@@ -70,7 +68,7 @@ export default function ProductsPage() {
           type: "success",
           message: finalData?.message,
         });
-        return finalData;
+        return finalData.data;
       }
     },
     onError: (err) => {
@@ -107,8 +105,8 @@ export default function ProductsPage() {
       dispatch(setLoading({ loading: true }));
       const res = await fetch("/api/products");
       const data = await res.json();
-      setProducts(data);
-      setFiltered(data);
+      setProducts(data.data);
+      setFiltered(data.data);
       dispatch(setLoading({ loading: false }));
     };
     fetchData();

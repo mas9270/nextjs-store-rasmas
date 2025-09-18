@@ -12,7 +12,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
 import Link from "next/link";
 
 interface Category {
@@ -27,42 +26,40 @@ interface Product {
   images: string[];
 }
 
-export default function Home() {
+export default function HomePageContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [catRes, prodRes] = await Promise.all([
-          fetch("/api/categories"),
-          fetch("/api/products"),
-        ]);
-        const cats = await catRes.json();
-        const prods = await prodRes.json();
-        setCategories(cats);
-        setProducts(prods);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-    fetchData();
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch((err) => {});
   }, []);
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="80vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((res) => {
+        setProducts(res.data);
+      })
+      .catch((err) => {});
+  }, []);
+
+  //   if (loading) {
+  //     return (
+  //       <Box
+  //         display="flex"
+  //         justifyContent="center"
+  //         alignItems="center"
+  //         height="80vh"
+  //       >
+  //         <CircularProgress />
+  //       </Box>
+  //     );
+  //   }
 
   return (
     <Box>
@@ -73,9 +70,7 @@ export default function Home() {
             <SwiperSlide key={index}>
               <Box
                 sx={{
-                  backgroundImage: `url(${
-                    item.images[0] || "https://picsum.photos/1600/600"
-                  })`,
+                  backgroundImage: `url(${item?.images[0]})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   height: { xs: 250, md: 400 },
@@ -128,8 +123,8 @@ export default function Home() {
             },
           }}
         >
-          {categories.map((cat) => (
-            <Link key={cat.id} href={`/category/${cat.id}`} passHref>
+          {categories?.map((cat, index) => (
+            <Link key={index} href={`/category/${cat.id}`}>
               <Card
                 sx={{
                   width: 200,
@@ -191,8 +186,8 @@ export default function Home() {
             },
           }}
         >
-          {products.map((product) => (
-            <Link key={product.id} href={`/products/${product.id}`} passHref>
+          {products?.map((product, index) => (
+            <Link key={index} href={`/products/${product.id}`}>
               <Card
                 sx={{
                   width: 200,
@@ -207,7 +202,7 @@ export default function Home() {
                 <CardMedia
                   component="img"
                   height="120"
-                  image={product.images?.[0]}
+                  image={product?.images[0]}
                   alt={product.title}
                 />
                 <CardContent>

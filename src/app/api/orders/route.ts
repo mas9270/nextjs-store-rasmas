@@ -1,32 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { decrypt } from "@/lib/sessions";
+import { getUserIdOrUnauthorized } from "@/lib/sessions";
 
 // POST /api/orders/create
 export async function POST(req: NextRequest) {
   try {
-    // گرفتن توکن از کوکی
-    const cookieStore = await cookies();
-    const token = cookieStore.get("rasmastoken")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "توکن موجود نیست" },
-        { status: 401 }
-      );
-    }
-
-    // دی‌کریپت توکن
-    const payload = await decrypt(token);
-    if (!payload || !payload.id) {
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر است" },
-        { status: 401 }
-      );
-    }
-
-    const userId = +payload.id;
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
     // گرفتن سبد خرید کاربر
     const cart = await prisma.cart.findUnique({
@@ -80,29 +60,10 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/orders
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    // گرفتن توکن از کوکی
-    const cookieStore = await cookies();
-    const token = cookieStore.get("rasmastoken")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "توکن موجود نیست" },
-        { status: 401 }
-      );
-    }
-
-    // دی‌کریپت توکن
-    const payload = await decrypt(token);
-    if (!payload || !payload.id) {
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر است" },
-        { status: 401 }
-      );
-    }
-
-    const userId = +payload.id;
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
     // گرفتن سفارش‌های کاربر
     const orders = await prisma.order.findMany({
@@ -110,7 +71,7 @@ export async function GET(req: NextRequest) {
       include: {
         items: { include: { product: true } },
       },
-      orderBy: { createdAt: "desc" }, // جدیدترین سفارش‌ها ابتدا
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({

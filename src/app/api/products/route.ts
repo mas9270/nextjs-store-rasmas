@@ -1,21 +1,30 @@
 // src/app/api/products/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getUserIdOrUnauthorized } from "@/lib/sessions";
 
+// GET همه محصولات
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
       include: { category: true },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(products);
+    return NextResponse.json(
+      { success: true, message: "", data: products },
+      { status: 200 }
+    );
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
+// POST ایجاد محصول
 export async function POST(req: Request) {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const body = await req.json();
     const { title, description, price, stock, categoryId } = body;
 
@@ -33,7 +42,6 @@ export async function POST(req: Request) {
         `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/600/400`
     );
 
-    // ذخیره محصول در دیتابیس
     const newProduct = await prisma.product.create({
       data: {
         title,
@@ -45,7 +53,10 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(newProduct, { status: 201 });
+    return NextResponse.json(
+      { success: true, message: "عملیات با موفقیت انجام شد", data: newProduct },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error(error);
     return NextResponse.json(
@@ -55,21 +66,32 @@ export async function POST(req: Request) {
   }
 }
 
+// PUT بروزرسانی محصول
 export async function PUT(req: Request) {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const { id, ...data } = await req.json();
     const updated = await prisma.product.update({
       where: { id: Number(id) },
       data,
     });
-    return NextResponse.json(updated);
+    return NextResponse.json(
+      { success: true, message: "عملیات با موفقیت انجام شد", data: updated },
+      { status: 201 }
+    );
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
+// DELETE حذف محصول
 export async function DELETE(req: Request) {
   try {
+    const { error } = await getUserIdOrUnauthorized();
+    if (error) return error;
+
     const { id } = await req.json();
     await prisma.product.delete({ where: { id: Number(id) } });
     return NextResponse.json({ message: "محصول حذف شد" });

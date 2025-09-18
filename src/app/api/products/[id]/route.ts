@@ -2,7 +2,10 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const productId = Number(params.id);
 
@@ -18,13 +21,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     });
 
     if (!product) {
-      return NextResponse.json(
-        { message: "محصول پیدا نشد" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "محصول پیدا نشد" }, { status: 404 });
     }
 
-    return NextResponse.json(product);
+    return NextResponse.json(
+      { success: true, message: "عملیات با موفقیت انجام شد", data: product },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error(error);
     return NextResponse.json(

@@ -1,30 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { decrypt } from "@/lib/sessions";
-import { notifyCartUpdate } from "@/app/api/ws/route";
-
-// تابع مشترک برای گرفتن userId از کوکی
-async function getUserIdFromToken() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("rasmastoken")?.value;
-  if (!token) return null;
-
-  const payload = await decrypt(token);
-  if (!payload || !payload.id) return null;
-
-  return +payload.id;
-}
+import { getUserIdOrUnauthorized } from "@/lib/sessions";
 
 // GET /api/cart
 export async function GET() {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId)
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر یا موجود نیست" },
-        { status: 401 }
-      );
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
     const cart = await prisma.cart.findUnique({
       where: { userId },
@@ -55,12 +37,8 @@ export async function GET() {
 // POST /api/cart
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId)
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر یا موجود نیست" },
-        { status: 401 }
-      );
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
     const { productId, quantity } = await req.json();
     if (!productId || typeof quantity !== "number")
@@ -79,14 +57,13 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
 
-    // گرفتن سبد خرید کاربر
+    // گرفتن یا ساختن سبد خرید
     let cart = await prisma.cart.findUnique({
       where: { userId },
       include: { items: true },
     });
 
     if (!cart) {
-      // اگر کارتی وجود نداشت
       const initialQty = quantity === 0 ? 1 : quantity;
       if (initialQty > product.stock) {
         return NextResponse.json(
@@ -99,16 +76,17 @@ export async function POST(req: NextRequest) {
       }
 
       cart = await prisma.cart.create({
-        data: { userId, items: { create: { productId, quantity: initialQty } } },
+        data: {
+          userId,
+          items: { create: { productId, quantity: initialQty } },
+        },
         include: { items: { include: { product: true } } },
       });
     } else {
-      // کارت وجود دارد
       const existingItem = cart.items.find((i) => i.productId === productId);
 
       if (existingItem) {
-        const newQty =
-          quantity === 0 ? existingItem.quantity + 1 : quantity;
+        const newQty = quantity === 0 ? existingItem.quantity + 1 : quantity;
 
         if (newQty > product.stock) {
           return NextResponse.json(
@@ -142,7 +120,6 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // بروزرسانی سبد خرید
       cart = await prisma.cart.findUnique({
         where: { userId },
         include: {
@@ -151,7 +128,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // اطلاع‌رسانی به WebSocket
     // notifyCartUpdate(userId, cart);
 
     return NextResponse.json({
@@ -167,17 +143,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
-
 // DELETE /api/cart
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId)
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر یا موجود نیست" },
-        { status: 401 }
-      );
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
     const { productId } = await req.json();
     if (!productId)

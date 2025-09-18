@@ -1,32 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { decrypt } from "@/lib/sessions";
+import { getUserIdOrUnauthorized } from "@/lib/sessions";
 
 // GET /api/orders/[id]
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    // گرفتن توکن از کوکی
-    const cookieStore = await cookies();
-    const token = cookieStore.get("rasmastoken")?.value;
+    // گرفتن شناسه کاربر از توکن
+    const { userId, error } = await getUserIdOrUnauthorized();
+    if (error) return error;
 
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "توکن موجود نیست" },
-        { status: 401 }
-      );
-    }
-
-    // دی‌کریپت توکن
-    const payload = await decrypt(token);
-    if (!payload || !payload.id) {
-      return NextResponse.json(
-        { success: false, message: "توکن نامعتبر است" },
-        { status: 401 }
-      );
-    }
-
-    const userId = +payload.id;
     const orderId = Number(params.id);
 
     if (isNaN(orderId)) {

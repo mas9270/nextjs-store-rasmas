@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import MuiProviders from "@/providers/muiProvider";
 import ReduxProvider from "@/providers/reduxProvider";
-import IntervalTokenChecker from "@/components/shared/intervalTokenChecker";
 import TankQueryProvider from "@/providers/tankQueryProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { ToastProvider } from "@/providers/toastProvider";
+import FirstConfig from "@/providers/firstConfig";
 import "./globals.css";
+import "swiper/css";
 
 const iranSanse = localFont({
   src: [
@@ -84,9 +84,10 @@ export default function RootLayout({
         <ReduxProvider>
           <AppRouterCacheProvider>
             <MuiProviders>
-              <ToastProvider />
-              <IntervalTokenChecker />
-              <TankQueryProvider>{children}</TankQueryProvider>
+              <TankQueryProvider>
+                <FirstConfig />
+                {children}
+              </TankQueryProvider>
             </MuiProviders>
           </AppRouterCacheProvider>
         </ReduxProvider>
