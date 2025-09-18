@@ -192,7 +192,7 @@ export default function Home() {
           }}
         >
           {products.map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`} passHref>
+            <Link key={product.id} href={`/products/${product.id}`} passHref>
               <Card
                 sx={{
                   width: 200,
