@@ -106,7 +106,7 @@ export default function HomePageContent() {
           <Typography variant="h5" fontWeight="bold">
             دسته‌بندی‌ها
           </Typography>
-          <Link href="/categories" passHref>
+          <Link href="/categories">
             <Button variant="text">مشاهده همه</Button>
           </Link>
         </Box>
@@ -169,7 +169,7 @@ export default function HomePageContent() {
           <Typography variant="h5" fontWeight="bold">
             محصولات برتر
           </Typography>
-          <Link href="/products" passHref>
+          <Link href="/products"  >
             <Button variant="text">مشاهده همه</Button>
           </Link>
         </Box>
