@@ -13,6 +13,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { reactToastify } from "@/lib/toastify";
 import { useAppSelector } from "@/store/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Product = {
   id: number;
@@ -29,8 +30,45 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const { data } = useAppSelector((state) => state.userInfo);
+  const queryClient = useQueryClient();
 
-  
+  const mutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        body: JSON.stringify({ productId: id, quantity: 0 }),
+      });
+      const finalData: any = await res.json();
+      if (finalData?.success) {
+        reactToastify({
+          type: "success",
+          message: "کالا با موفقیت به سبد خرید افزوده شد",
+        });
+        return finalData;
+      } else {
+        reactToastify({
+          type: "success",
+          message: finalData?.message,
+        });
+        return finalData;
+      }
+    },
+    onError: (err) => {
+      reactToastify({
+        type: "error",
+        message: "خطایی رخ داده است دوباره تلاش کنید",
+      });
+    },
+    onMutate: (e) => {},
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+
+  function addToCart({ id }: { id: number }) {
+    mutation.mutate(id);
+  }
+
   useEffect(() => {
     if (!id) return;
 
@@ -106,6 +144,7 @@ export default function ProductDetailPage() {
               disabled={product.stock === 0}
               onClick={() => {
                 if (data) {
+                  addToCart({ id: product.id });
                 } else {
                   reactToastify({
                     type: "warning",

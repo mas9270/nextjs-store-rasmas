@@ -22,6 +22,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { reactToastify } from "@/lib/toastify";
 import { setLoading } from "@/store/slices/appLoading";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Product = {
   id: number;
@@ -33,6 +34,7 @@ type Product = {
 };
 
 export default function ProductsPage() {
+  const queryClient = useQueryClient();
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [search, setSearch] = useState(""); // متن سرچ
@@ -45,8 +47,43 @@ export default function ProductsPage() {
   const [page, setPage] = useState(currentPage);
   const { data } = useAppSelector((state) => state.userInfo);
   const { loading } = useAppSelector((state) => state.appLoading);
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  // const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+
+  const mutation = useMutation({
+
+    mutationFn: async (id: number) => {
+      
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        body: JSON.stringify({ productId: id, quantity: 0 }),
+      });
+      const finalData: any = await res.json();
+      if (finalData?.success) {
+        reactToastify({
+          type: "success",
+          message: "کالا با موفقیت به سبد خرید افزوده شد",
+        });
+        return finalData;
+      } else {
+        reactToastify({
+          type: "success",
+          message: finalData?.message,
+        });
+        return finalData;
+      }
+    },
+    onError: (err) => {
+      reactToastify({
+        type: "error",
+        message: "خطایی رخ داده است دوباره تلاش کنید",
+      });
+    },
+    onMutate: (e) => {},
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
 
   // sync page state with query
   useEffect(() => {
@@ -107,36 +144,8 @@ export default function ProductsPage() {
     router.push(`?page=${value}`);
   };
 
-  function addToCart(item: { id: number | null }) {
-    setBtnLoading(true);
-    if (item.id) {
-      fetch("/api/cart", {
-        method: "POST",
-        body: JSON.stringify({ productId: item.id, quantity: 0 }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.success) {
-            reactToastify({
-              type: "success",
-              message: "کالا با موفقیت به سبد خرید افزوده شد",
-            });
-          } else {
-            reactToastify({
-              type: "success",
-              message: res.message,
-            });
-          }
-          setBtnLoading(false);
-        })
-        .catch((err) => {
-          reactToastify({
-            type: "error",
-            message: "خطایی رخ داده است دوباره تلاش کنید",
-          });
-          setBtnLoading(false);
-        });
-    }
+  function addToCart({ id }: { id: number }) {
+    mutation.mutate(id);
   }
 
   return (
@@ -252,7 +261,7 @@ export default function ProductsPage() {
                     }}
                   >
                     <Button
-                      loading={btnLoading}
+                      loading={mutation.isPending}
                       fullWidth
                       size="small"
                       variant="outlined"
@@ -262,16 +271,15 @@ export default function ProductsPage() {
                       نمایش
                     </Button>
                     <Button
-                      loading={btnLoading}
+                      loading={mutation.isPending}
                       fullWidth
                       size="small"
                       variant="contained"
                       color="secondary"
                       disabled={product.stock === 0}
                       onClick={() => {
-                        console.log(data);
                         if (data) {
-                          addToCart({ id: product?.id ? product?.id : null });
+                          addToCart({ id: product.id });
                         } else {
                           reactToastify({
                             type: "warning",

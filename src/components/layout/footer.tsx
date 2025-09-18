@@ -68,6 +68,7 @@ export default function FooterPage() {
             {appRoutes.map((item, index) => {
               return (
                 <Link
+                  key={index}
                   href={item.path}
                   style={{
                     textDecoration: "none",

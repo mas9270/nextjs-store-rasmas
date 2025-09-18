@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
+    // بررسی محصول
     const product = await prisma.product.findUnique({
       where: { id: productId },
     });
@@ -77,40 +78,71 @@ export async function POST(req: NextRequest) {
         { success: false, message: "محصول موجود نیست" },
         { status: 404 }
       );
-    if (quantity > product.stock)
-      return NextResponse.json(
-        {
-          success: false,
-          message: `تعداد سفارش بیشتر از موجودی (${product.stock})`,
-        },
-        { status: 400 }
-      );
 
+    // گرفتن سبد خرید کاربر
     let cart = await prisma.cart.findUnique({
       where: { userId },
       include: { items: true },
     });
 
     if (!cart) {
+      // اگر کارتی وجود نداشت
+      const initialQty = quantity === 0 ? 1 : quantity;
+      if (initialQty > product.stock) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `تعداد سفارش بیشتر از موجودی (${product.stock})`,
+          },
+          { status: 400 }
+        );
+      }
+
       cart = await prisma.cart.create({
-        data: { userId, items: { create: { productId, quantity } } },
+        data: { userId, items: { create: { productId, quantity: initialQty } } },
         include: { items: { include: { product: true } } },
       });
     } else {
+      // کارت وجود دارد
       const existingItem = cart.items.find((i) => i.productId === productId);
+
       if (existingItem) {
+        const newQty =
+          quantity === 0 ? existingItem.quantity + 1 : quantity;
+
+        if (newQty > product.stock) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: `تعداد سفارش بیشتر از موجودی (${product.stock})`,
+            },
+            { status: 400 }
+          );
+        }
+
         await prisma.cartItem.update({
           where: { id: existingItem.id },
-          data: {
-            quantity: quantity !== 0 ? quantity : existingItem.quantity + 1,
-          },
+          data: { quantity: newQty },
         });
       } else {
+        const newQty = quantity === 0 ? 1 : quantity;
+
+        if (newQty > product.stock) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: `تعداد سفارش بیشتر از موجودی (${product.stock})`,
+            },
+            { status: 400 }
+          );
+        }
+
         await prisma.cartItem.create({
-          data: { cartId: cart.id, productId, quantity },
+          data: { cartId: cart.id, productId, quantity: newQty },
         });
       }
 
+      // بروزرسانی سبد خرید
       cart = await prisma.cart.findUnique({
         where: { userId },
         include: {
@@ -119,7 +151,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    notifyCartUpdate(userId, cart);
+    // اطلاع‌رسانی به WebSocket
+    // notifyCartUpdate(userId, cart);
 
     return NextResponse.json({
       success: true,
@@ -133,6 +166,8 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
 
 // DELETE /api/cart
 export async function DELETE(req: NextRequest) {
@@ -177,7 +212,7 @@ export async function DELETE(req: NextRequest) {
       },
     });
 
-    notifyCartUpdate(userId, updatedCart);
+    // notifyCartUpdate(userId, updatedCart);
 
     return NextResponse.json({
       success: true,

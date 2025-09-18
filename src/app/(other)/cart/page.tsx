@@ -18,6 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Product = {
   id: number;
@@ -40,94 +41,106 @@ type Cart = {
 };
 
 export default function CartPage() {
-  const [cart, setCart] = useState<Cart | null>(null);
-  const { loading } = useAppSelector((state) => state.appLoading);
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const { loading } = useAppSelector((state) => state.appLoading);
+  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  function getList() {
-    dispatch(setLoading({ loading: true }));
-    fetch(`/api/cart`)
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.data) setCart(res.data);
-        dispatch(setLoading({ loading: false }));
-      })
-      .catch((err) => {
-        reactToastify({ type: "error", message: err });
-        dispatch(setLoading({ loading: false }));
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["cart"],
+    queryFn: async (e) => {
+      const res = await fetch("/api/cart");
+      return res.json();
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      id,
+      newQuantity,
+      productId,
+      type,
+    }: {
+      id: number;
+      newQuantity: number;
+      productId: number;
+      type: "add" | "delete";
+    }) => {
+      if (type === "add") {
+        const res = await fetch("/api/cart", {
+          method: "POST",
+          body: JSON.stringify({ productId, quantity: newQuantity }),
+        });
+        const finalData: any = await res.json();
+        if (finalData?.success) {
+          reactToastify({
+            type: "success",
+            message: "کالا با موفقیت به سبد خرید افزوده شد",
+          });
+          return finalData.data;
+        } else {
+          reactToastify({
+            type: "warning",
+            message: finalData?.message,
+          });
+          return finalData;
+        }
+      } else {
+        const res = await fetch("/api/cart", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          reactToastify({
+            type: "success",
+            message: data?.message,
+          });
+          return data.data;
+        } else {
+          reactToastify({
+            type: "warning",
+            message: data?.message,
+          });
+          return data.data;
+        }
+      }
+    },
+    onError: (err) => {
+      reactToastify({
+        type: "error",
+        message: "خطایی رخ داده است دوباره تلاش کنید",
       });
-  }
-  // بارگذاری سبد خرید
-  useEffect(() => {
-    getList();
-  }, []);
+    },
+    onMutate: (e) => {},
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
 
   // افزایش/کاهش تعداد
-  const updateQuantity = async (itemId: number, delta: number) => {
-    if (!cart) return;
-    const item = cart.items.find((i) => i.id === +itemId);
+  const updateQuantity = async (
+    itemId: number,
+    delta: number,
+    productId: number
+  ) => {
+    if (!data?.data) return;
+    const item = data?.data?.items.find((i: any) => i.id === +itemId);
     if (!item) return;
     const newQuantity = item.quantity + delta;
     if (newQuantity < 1) return;
-    setBtnLoading(true);
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: item.product.id,
-          quantity: newQuantity,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCart(data.data);
-      } else {
-        reactToastify({
-          type: "warning",
-          message: data?.message,
-        });
-      }
-
-      setBtnLoading(false);
-    } catch (error: any) {
-      reactToastify({ type: "error", message: error.message });
-      setBtnLoading(false);
-    }
+    mutation.mutate({ id: itemId, newQuantity, productId, type: "add" });
   };
 
   // حذف محصول
-  const removeItem = async (itemId: number) => {
+  const removeItem = async (itemId: number, productId: number) => {
+    const cart = data?.data;
     if (!cart) return;
-    const item = cart.items.find((i) => i.id === itemId);
+    const item = cart.items.find((i: any) => i.id === itemId);
     if (!item) return;
-    setBtnLoading(true);
-    try {
-      const res = await fetch("/api/cart", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: item.product.id }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCart(data.data);
-        reactToastify({
-          type: "success",
-          message: data?.message,
-        });
-      } else {
-        reactToastify({
-          type: "warning",
-          message: data?.message,
-        });
-      }
-      setBtnLoading(false);
-    } catch (error: any) {
-      reactToastify({ type: "error", message: error.message });
-      setBtnLoading(false);
-    }
+    mutation.mutate({ id: itemId, newQuantity: 0, productId, type: "delete" });
   };
 
   const handleCheckout = async () => {
@@ -137,7 +150,7 @@ export default function CartPage() {
       .then((res) => {
         if (res.success) {
           reactToastify({ type: "success", message: res.message });
-          setCart(null);
+          queryClient.invalidateQueries({ queryKey: ["cart"] });
           router.push(`/cart/checkout?orderId=${res.data.id}`);
         } else {
           reactToastify({ type: "warning", message: res.message });
@@ -154,22 +167,22 @@ export default function CartPage() {
   };
 
   // نمایش لودر
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        width="100%"
-        flex={1}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Box
+  //       display="flex"
+  //       width="100%"
+  //       flex={1}
+  //       justifyContent="center"
+  //       alignItems="center"
+  //     >
+  //       <CircularProgress />
+  //     </Box>
+  //   );
+  // }
 
   // سبد خرید خالی
-  if (!cart || cart.items.length === 0) {
+  if (data?.data?.items && data?.data?.items?.length === 0) {
     return (
       <Box
         display="flex"
@@ -183,6 +196,8 @@ export default function CartPage() {
     );
   }
 
+  console.log(data);
+
   return (
     <Box px={{ xs: 2, sm: 4 }} py={4}>
       <Typography variant="h4" mb={3}>
@@ -194,7 +209,7 @@ export default function CartPage() {
         gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }}
         gap={3}
       >
-        {cart.items.map((item) => (
+        {data?.data?.items.map((item: any) => (
           <Card
             key={item.id}
             sx={{
@@ -220,23 +235,23 @@ export default function CartPage() {
             <CardActions sx={{ justifyContent: "space-between" }}>
               <Box>
                 <IconButton
-                  loading={btnLoading}
-                  onClick={() => updateQuantity(item.id, -1)}
+                  loading={btnLoading || mutation.isPending}
+                  onClick={() => updateQuantity(item.id, -1, item.product.id)}
                   size="small"
                 >
                   <RemoveIcon />
                 </IconButton>
                 <IconButton
-                  loading={btnLoading}
-                  onClick={() => updateQuantity(item.id, 1)}
+                  loading={btnLoading || mutation.isPending}
+                  onClick={() => updateQuantity(item.id, 1, item.product.id)}
                   size="small"
                 >
                   <AddIcon />
                 </IconButton>
               </Box>
               <IconButton
-                loading={btnLoading}
-                onClick={() => removeItem(item.id)}
+                loading={btnLoading || mutation.isPending}
+                onClick={() => removeItem(item.id, item.product.id)}
                 color="error"
                 size="small"
               >
@@ -252,7 +267,7 @@ export default function CartPage() {
           variant="contained"
           color="primary"
           onClick={handleCheckout}
-          loading={btnLoading}
+          loading={btnLoading || mutation.isPending}
         >
           ثبت سفارش
         </Button>
