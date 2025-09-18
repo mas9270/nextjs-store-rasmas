@@ -196,8 +196,6 @@ export default function CartPage() {
     );
   }
 
-  console.log(data);
-
   return (
     <Box px={{ xs: 2, sm: 4 }} py={4}>
       <Typography variant="h4" mb={3}>
@@ -218,19 +216,33 @@ export default function CartPage() {
               position: "relative",
             }}
           >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6">{item.product.title}</Typography>
-              <Typography color="text.secondary">
-                قیمت واحد: {item.product.price.toLocaleString()} تومان
-              </Typography>
-              <Typography color="text.secondary">
-                تعداد: {item.quantity}
-              </Typography>
-              <Typography color="text.secondary" fontWeight="bold">
-                مجموع: {(item.product.price * item.quantity).toLocaleString()}{" "}
-                تومان
-              </Typography>
-            </CardContent>
+            <Box display="flex" alignItems="flex-start" p={2}>
+              <Box
+                component="img"
+                src={item.product.images[0]}
+                alt={item.product.title}
+                sx={{
+                  width: 100,
+                  height: 100,
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  mr: 2,
+                }}
+              />
+              <CardContent sx={{ flex: 1, p: 0 }}>
+                <Typography variant="h6">{item.product.title}</Typography>
+                <Typography color="text.secondary">
+                  قیمت واحد: {item.product.price.toLocaleString()} تومان
+                </Typography>
+                <Typography color="text.secondary">
+                  تعداد: {item.quantity}
+                </Typography>
+                <Typography color="text.secondary" fontWeight="bold">
+                  مجموع: {(item.product.price * item.quantity).toLocaleString()}{" "}
+                  تومان
+                </Typography>
+              </CardContent>
+            </Box>
             <Divider />
             <CardActions sx={{ justifyContent: "space-between" }}>
               <Box>
