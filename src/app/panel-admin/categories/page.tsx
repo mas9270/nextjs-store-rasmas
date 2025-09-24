@@ -63,14 +63,15 @@ export default function CategoryPage() {
     fetch("/api/categories")
       .then((res) => res.json())
       .then((res) => {
-        dispatch(setLoading({ loading: false }));
-        setRows(res);
+        setRows(res.data);
       })
       .catch((err) => {
         reactToastify({
           type: "error",
           message: err.message,
         });
+      })
+      .finally(() => {
         dispatch(setLoading({ loading: false }));
       });
   }

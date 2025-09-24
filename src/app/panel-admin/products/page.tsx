@@ -75,16 +75,16 @@ export default function ProductsPage() {
     fetch("/api/products")
       .then((res) => res.json())
       .then((res) => {
-        dispatch(setLoading({ loading: false }));
-        setRows(res);
+        setRows(res.data);
       })
       .catch((err) => {
         reactToastify({
           type: "error",
           message: err.message,
         });
+      }).finally(() => {
         dispatch(setLoading({ loading: false }));
-      });
+      })
   }
 
   function actionBtn() {

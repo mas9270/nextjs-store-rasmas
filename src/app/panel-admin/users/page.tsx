@@ -73,7 +73,6 @@ export default function UsersPage() {
     fetch("/api/users")
       .then((res) => res.json())
       .then((res) => {
-        dispatch(setLoading({ loading: false }));
         setRows(res.data);
       })
       .catch((err) => {
@@ -81,8 +80,9 @@ export default function UsersPage() {
           type: "error",
           message: err.message,
         });
+      }).finally(() => {
         dispatch(setLoading({ loading: false }));
-      });
+      })
   }
 
   function actionBtn() {

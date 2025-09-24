@@ -83,16 +83,16 @@ export default function ContactMessagesPage() {
     fetch("/api/contact-messages")
       .then((res) => res.json())
       .then((res) => {
-        dispatch(setLoading({ loading: false }));
-        setRows(res);
+        setRows(res.data);
       })
       .catch((err) => {
         reactToastify({
           type: "error",
           message: err.message,
         });
+      }).finally(() => {
         dispatch(setLoading({ loading: false }));
-      });
+      })
   }
 
   function actionBtn() {
