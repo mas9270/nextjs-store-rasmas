@@ -23,29 +23,31 @@ export default function DeleteUser(props: {
       },
       body: JSON.stringify({ id: data.info.id }),
     })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res?.error) {
+      .then(async (res) => {
+        const response: any = await res.json()
+        if (!res.ok) {
           reactToastify({
             type: "error",
-            message: res.error,
+            message: response?.message,
           });
-        } else {
+        }
+        else {
           reactToastify({
             type: "success",
-            message: res.message,
+            message: response?.message,
           });
           onClose(true);
         }
-        dispatch(setLoading({ loading: false }));
       })
-      .catch(() => {
+      .catch((err) => {
         reactToastify({
           type: "error",
-          message: "خطایی رخ داده است دوباره تلاش کنید",
+          message: err?.message ? err.message : "خطایی رخ داده است دوباره تلاش کنید",
         });
+      })
+      .finally(() => {
         dispatch(setLoading({ loading: false }));
-      });
+      })
   }
 
   return (

@@ -40,7 +40,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState(""); // متن سرچ
   const [debouncedSearch, setDebouncedSearch] = useState(""); // متن با تاخیر
   const [sort, setSort] = useState("");
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;

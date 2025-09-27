@@ -5,9 +5,6 @@ import { getUserIdOrUnauthorized } from "@/lib/sessions";
 // دریافت همه دسته‌بندی‌ها
 export async function GET() {
   try {
-    // const { error } = await getUserIdOrUnauthorized();
-    // if (error) return error;
-
     const categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
     });

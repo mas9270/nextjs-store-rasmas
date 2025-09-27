@@ -59,7 +59,7 @@ export default function ProductDetailPage() {
         message: "خطایی رخ داده است دوباره تلاش کنید",
       });
     },
-    onMutate: (e) => {},
+    onMutate: (e) => { },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
@@ -72,19 +72,20 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!id) return;
 
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(`/api/products/${id}`);
-        const data = await res.json();
-        setProduct(data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
+    fetch(`/api/products/${id}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setProduct(res.data);
         setLoading(false);
-      }
-    };
+      })
+      .catch((err) => {
+        reactToastify({
+          type: "error",
+          message: err.message
+        })
+        setLoading(false);
+      })
 
-    fetchProduct();
   }, [id]);
 
   if (loading) {
@@ -141,7 +142,8 @@ export default function ProductDetailPage() {
             <Button
               variant="contained"
               color="secondary"
-              disabled={product.stock === 0}
+              disabled={product.stock === 0 || mutation.isPending}
+              loading={mutation.isPending}
               onClick={() => {
                 if (data) {
                   addToCart({ id: product.id });
@@ -159,6 +161,8 @@ export default function ProductDetailPage() {
               variant="outlined"
               color="primary"
               onClick={() => router.back()}
+              disabled={mutation.isPending}
+              loading={mutation.isPending}
             >
               بازگشت
             </Button>

@@ -56,7 +56,7 @@ function Form(props: { info?: any; done: () => void }) {
         description: info?.description || "",
         price: info?.price || 0,
         stock: info?.stock || 0,
-        categoryId: info?.categoryId || 0,
+        categoryId: +info?.categoryId || 0,
       },
       resolver: zodResolver(schema),
     });
@@ -65,34 +65,46 @@ function Form(props: { info?: any; done: () => void }) {
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
-      .then(setCategories)
+      .then((res) => {
+        setCategories(res.data)
+        // setValue("categoryId", +info?.categoryId || 0)
+      })
       .catch(() =>
         reactToastify({ type: "error", message: "خطا در دریافت دسته‌بندی‌ها" })
       );
   }, []);
 
+
+
   const onSubmit = async (data: FormValues) => {
     dispatch(setLoading({ loading: true }));
     try {
       if (info) {
-        await fetch("/api/products", {
+        fetch("/api/products", {
           method: "PUT",
-          body: JSON.stringify({ id: info.id, ...data }),
-        });
+          body: JSON.stringify({ id: info.id, ...data })
+        })
+          .then(() => {
+            reactToastify({ type: "success", message: "عملیات با موفقیت انجام شد" });
+            done();
+          })
       } else {
         await fetch("/api/products", {
           method: "POST",
           body: JSON.stringify(data),
-        });
+        })
+          .then(() => {
+            reactToastify({ type: "success", message: "عملیات با موفقیت انجام شد" });
+            done();
+          })
       }
-      reactToastify({ type: "success", message: "عملیات با موفقیت انجام شد" });
-      done();
+      dispatch(setLoading({ loading: false }));
+
     } catch (err: any) {
       reactToastify({
         type: "error",
         message: err?.message || "خطایی رخ داده است",
       });
-    } finally {
       dispatch(setLoading({ loading: false }));
     }
   };
@@ -132,6 +144,8 @@ function Form(props: { info?: any; done: () => void }) {
             size="small"
             select
             label="دسته‌بندی"
+            type="number"
+            value={watch("categoryId")}
             {...register("categoryId", { valueAsNumber: true })}
             error={!!formState.errors.categoryId}
             helperText={formState.errors.categoryId?.message}
@@ -160,6 +174,7 @@ function Form(props: { info?: any; done: () => void }) {
             type="submit"
             variant="contained"
             disabled={loading}
+            loading={loading}
             size="small"
           >
             ذخیره
