@@ -145,7 +145,7 @@ export default function ContactMessagesPage() {
         rowSelection={false}
         pageSizeOptions={[5, 10, 20]}
         initialState={{
-          pagination: { paginationModel: { pageSize: 5, page: 0 } },
+          pagination: { paginationModel: { pageSize: 20, page: 0 } },
         }}
         localeText={{
           // filterOperatorDoesNotContain: "wwww",

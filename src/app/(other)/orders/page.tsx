@@ -118,7 +118,7 @@ export default function OrdersPage() {
         columns={columns}
         pageSizeOptions={[5, 10, 20]}
         initialState={{
-          pagination: { paginationModel: { pageSize: 5, page: 0 } },
+          pagination: { paginationModel: { pageSize: 20, page: 0 } },
         }}
         loading={loading}
         localeText={{
