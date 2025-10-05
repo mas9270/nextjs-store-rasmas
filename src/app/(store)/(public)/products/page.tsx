@@ -44,6 +44,7 @@ export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
+  const categoryNumber = Number(searchParams.get("category")) || 1;
   const [page, setPage] = useState(currentPage);
   const { data } = useAppSelector((state) => state.userInfo);
   const { loading } = useAppSelector((state) => state.appLoading);

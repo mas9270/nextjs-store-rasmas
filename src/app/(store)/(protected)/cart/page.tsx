@@ -182,7 +182,7 @@ export default function CartPage() {
   // }
 
   // سبد خرید خالی
-  if (data?.data?.items && data?.data?.items?.length === 0) {
+  if (!data?.data?.items || data?.data?.items?.length === 0) {
     return (
       <Box
         display="flex"

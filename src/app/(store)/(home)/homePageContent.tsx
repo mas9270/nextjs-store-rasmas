@@ -36,7 +36,7 @@ export default function HomePageContent() {
       .then((res) => {
         setCategories(res.data);
       })
-      .catch((err) => {});
+      .catch((err) => { });
   }, []);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function HomePageContent() {
       .then((res) => {
         setProducts(res.data);
       })
-      .catch((err) => {});
+      .catch((err) => { });
   }, []);
 
   //   if (loading) {
@@ -68,35 +68,37 @@ export default function HomePageContent() {
         <Swiper spaceBetween={10} slidesPerView={1} loop autoplay>
           {products?.slice(0, 5).map((item, index) => (
             <SwiperSlide key={index}>
-              <Box
-                sx={{
-                  backgroundImage: `url(${item?.images[0]})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  height: { xs: 250, md: 400 },
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                }}
-              >
-                <Typography
-                  variant="h4"
-                  fontWeight="bold"
-                  bgcolor="rgba(0,0,0,0.5)"
-                  p={1}
-                  borderRadius={1}
+              <Link key={index} href={`/products/${item.id}`}>
+                <Box
+                  sx={{
+                    backgroundImage: `url(${item?.images[0]})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    height: { xs: 250, md: 400 },
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                  }}
                 >
-                  {item.title}
-                </Typography>
-              </Box>
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    bgcolor="rgba(0,0,0,0.5)"
+                    p={1}
+                    borderRadius={1}
+                  >
+                    {item.title}
+                  </Typography>
+                </Box>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
       </Box>
 
       {/* دسته‌بندی‌ها */}
-      <Container sx={{ my: 6 }}>
+      {/* <Container sx={{ my: 6 }}>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -106,7 +108,7 @@ export default function HomePageContent() {
           <Typography variant="h5" fontWeight="bold">
             دسته‌بندی‌ها
           </Typography>
-          <Link href="/categories">
+          <Link href={`/categories`}>
             <Button variant="text">مشاهده همه</Button>
           </Link>
         </Box>
@@ -124,7 +126,7 @@ export default function HomePageContent() {
           }}
         >
           {categories?.map((cat, index) => (
-            <Link key={index} href={`/category/${cat.id}`}>
+            <Link key={index} href={`/products?page=1&category=${cat.id}`}>
               <Card
                 sx={{
                   width: 200,
@@ -156,7 +158,7 @@ export default function HomePageContent() {
             </Link>
           ))}
         </Box>
-      </Container>
+      </Container> */}
 
       {/* محصولات برتر افقی */}
       <Container sx={{ my: 6 }}>
