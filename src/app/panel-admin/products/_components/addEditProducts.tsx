@@ -46,6 +46,7 @@ function Form(props: { info?: any; done: () => void }) {
     description: z.string().min(1, "توضیحات محصول الزامی است"),
     price: z.number().positive("قیمت باید مثبت باشد"),
     stock: z.number().int().nonnegative("موجودی باید عدد صحیح غیرمنفی باشد"),
+
     categoryId: z.number().min(1, "انتخاب دسته‌بندی الزامی است"),
   });
 

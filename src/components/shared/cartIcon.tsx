@@ -43,6 +43,7 @@ export default function CartIcon() {
 
 function CartCount() {
   const router = useRouter();
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["cart"],
     queryFn: async (e) => {
